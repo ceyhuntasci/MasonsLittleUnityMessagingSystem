@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class EventManager : MonoBehaviour
+public static class EventManager : MonoBehaviour
 {
     private static Dictionary<string, List<Action<Model>>> eventDictionary = new Dictionary<string, List<Action<Model>>>();
 

@@ -1,5 +1,5 @@
 ## Mason's Little Unity Messaging System
-This little framework let's scripts communicate between themselves easily. Create your game events and make every script handle their actions.
+This little framework lets scripts communicate between themselves easily. Create your game events and make every script handle their actions.
 
 
 ## Usage

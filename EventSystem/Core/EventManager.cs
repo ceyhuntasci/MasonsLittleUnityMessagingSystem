@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-public static class EventManager : MonoBehaviour
+public static class EventManager
 {
     private static Dictionary<string, List<Action<Model>>> eventDictionary = new Dictionary<string, List<Action<Model>>>();
 
@@ -12,12 +12,34 @@ public static class EventManager : MonoBehaviour
 
         if (eventDictionary.TryGetValue(channel, out actionList))
         {
-            actionList.Add(action);
+            if (!actionList.Contains(action))
+            {
+                actionList.Add(action);
+            }
         }
         else
         {
             actionList = new List<Action<Model>>();
             actionList.Add(action);
+            eventDictionary.Add(channel, actionList);
+        }
+    }
+
+    public static void Subscribe(string channel, Action<Model> action, int eventQueue)
+    {
+        List<Action<Model>> actionList = null;
+
+        if (eventDictionary.TryGetValue(channel, out actionList))
+        {
+            if (!actionList.Contains(action))
+            {
+                actionList.Insert(0, action);
+            }
+        }
+        else
+        {
+            actionList = new List<Action<Model>>();
+            actionList.Insert(0, action);
             eventDictionary.Add(channel, actionList);
         }
     }
@@ -54,6 +76,10 @@ public static class EventManager : MonoBehaviour
                 catch (System.Exception e)
                 {
                     Debug.Log(e.Message);
+                    Debug.Log(e.Source);
+                    Debug.LogError(e.InnerException);
+                    Debug.LogError(e.StackTrace);
+
                 }
             }
         }

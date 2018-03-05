@@ -4,11 +4,11 @@ using System;
 
 public static class EventManager
 {
-    private static Dictionary<string, List<Action<Model>>> eventDictionary = new Dictionary<string, List<Action<Model>>>();
+    private static Dictionary<string, List<Action<EventModel>>> eventDictionary = new Dictionary<string, List<Action<EventModel>>>();
 
-    public static void Subscribe(string channel, Action<Model> action)
+    public static void Subscribe(string channel, Action<EventModel> action)
     {
-        List<Action<Model>> actionList = null;
+        List<Action<EventModel>> actionList = null;
 
         if (eventDictionary.TryGetValue(channel, out actionList))
         {
@@ -19,34 +19,34 @@ public static class EventManager
         }
         else
         {
-            actionList = new List<Action<Model>>();
+            actionList = new List<Action<EventModel>>();
             actionList.Add(action);
             eventDictionary.Add(channel, actionList);
         }
     }
 
-    public static void Subscribe(string channel, Action<Model> action, int eventQueue)
+    public static void Subscribe(string channel, Action<EventModel> action, int eventQueue)
     {
-        List<Action<Model>> actionList = null;
+        List<Action<EventModel>> actionList = null;
 
         if (eventDictionary.TryGetValue(channel, out actionList))
         {
             if (!actionList.Contains(action))
             {
-                actionList.Insert(0, action);
+                actionList.Insert(eventQueue, action);
             }
         }
         else
         {
-            actionList = new List<Action<Model>>();
-            actionList.Insert(0, action);
+            actionList = new List<Action<EventModel>>();
+            actionList.Add(action);
             eventDictionary.Add(channel, actionList);
         }
     }
 
-    public static void Unsubscribe(string channel, Action<Model> action)
+    public static void Unsubscribe(string channel, Action<EventModel> action)
     {
-        List<Action<Model>> actionList = null;
+        List<Action<EventModel>> actionList = null;
 
         if (eventDictionary.TryGetValue(channel, out actionList))
         {
@@ -61,17 +61,19 @@ public static class EventManager
         }
     }
 
-    public static void TriggerEvent(string eventName, Model model)
+    public static void TriggerEvent(string eventName, EventModel EventModel)
     {
-        List<Action<Model>> thisEventList = null;
+        List<Action<EventModel>> thisEventList = null;
 
         if (eventDictionary.TryGetValue(eventName, out thisEventList))
         {
-            for (int i = 0; i < thisEventList.Count; i++)
+            List<Action<EventModel>> temp = new List<Action<EventModel>>();
+            temp.AddRange(thisEventList);
+            for (int i = 0; i < temp.Count; i++)
             {
                 try
                 {
-                    thisEventList[i].Invoke(model);
+                    temp[i].Invoke(EventModel);
                 }
                 catch (System.Exception e)
                 {
@@ -79,7 +81,6 @@ public static class EventManager
                     Debug.Log(e.Source);
                     Debug.LogError(e.InnerException);
                     Debug.LogError(e.StackTrace);
-
                 }
             }
         }
